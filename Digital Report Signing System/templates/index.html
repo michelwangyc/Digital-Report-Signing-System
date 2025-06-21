@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=10">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>植物神经稳定性检测HIS连接平台 - IE兼容版</title>
+  
+  <!-- Bootstrap 3 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css">
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+    <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+  <![endif]-->
+
+  <style>
+    body {
+      background: url("/static/background.jpg") no-repeat center center fixed;
+      background-size: cover;
+    }
+    .container-custom {
+      background-color: #ffffff;
+      opacity: 0.95;
+      filter: alpha(opacity=95); /* IE8 */
+      padding: 20px;
+      border-radius: 10px;
+      -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+         -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+              box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+    #doctorVerifyModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+    }
+    .modal-box {
+      background: white;
+      padding: 20px;
+      border-radius: 5px;
+      width: 400px;
+      margin: 100px auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container container-custom">
+    <h1 class="text-center">植物神经稳定性检测HIS连接平台</h1>
+    <div class="row">
+
+      <!-- 待处理病人信息 -->
+      <div class="col-sm-4">
+        <h3>待诊疗患者信息</h3>
+        <ul class="list-group">
+          {% for patient in all_pending_patients %}
+          <li class="list-group-item">
+            <strong>{{ patient.name }}（{{ patient.patient_id }}）</strong><br>
+            {% if patient.status == "processing" %}
+            <span class="label label-success">已发送</span>
+            {% endif %}
+            <a href="{{ url_for('patient_detail', patient_id=patient.id) }}" class="btn btn-primary btn-xs" style="margin-top:5px;">查看信息</a>
+            {% if patient.status == "pending" %}
+            <button onclick="sendPatient({{ patient.id }}, this)" class="btn btn-success btn-xs" style="margin-top:5px;">发送信息</button>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- 已处理病人信息 -->
+      <div class="col-sm-4">
+        <h3>待签字患者报告</h3>
+        <ul class="list-group">
+          {% for patient in processed_patients %}
+          <li class="list-group-item">
+            <strong>{{ patient.name }}（{{ patient.patient_id }}）</strong><br>
+            <small class="text-muted">完成时间: {{ patient.completed_time.strftime('%Y-%m-%d %H:%M:%S') if patient.completed_time else '未记录' }}</small><br>
+            <a href="{{ url_for('patient_detail', patient_id=patient.id) }}" class="btn btn-primary btn-xs" style="margin-top:5px;">查看信息</a>
+            <a href="{{ url_for('view_pdf', patient_id=patient.id) }}" class="btn btn-info btn-xs" target="_blank" style="margin-top:5px;">查看报告</a>
+            <button onclick="handleSign({{ patient.id }})" class="btn btn-warning btn-xs" style="margin-top:5px;">报告签字</button>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- 已发送病人信息 -->
+      <div class="col-sm-4">
+        <h3>已完成患者报告</h3>
+        <ul class="list-group">
+          {% for patient in sent_patients %}
+          <li class="list-group-item">
+            <strong>{{ patient.name }}（{{ patient.patient_id }}）</strong><br>
+            <small class="text-muted">完成时间: {{ patient.completed_time if patient.completed_time else '未记录' }}</small><br>
+            <a href="{{ url_for('patient_detail', patient_id=patient.id) }}" class="btn btn-primary btn-xs" style="margin-top:5px;">查看信息</a>
+            <a href="{{ url_for('view_pdf', patient_id=patient.id) }}" class="btn btn-info btn-xs" target="_blank" style="margin-top:5px;">查看报告</a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 医生验证模态框 -->
+  <div id="doctorVerifyModal">
+    <div class="modal-box">
+      <h4>医生身份验证</h4>
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="javascript:void(0);" onclick="switchTab('name')">姓名和身份证验证</a></li>
+        <li><a href="javascript:void(0);" onclick="switchTab('work')">工号验证</a></li>
+      </ul>
+      <div id="verify-name" style="margin-top:10px;">
+        <label>医生姓名</label>
+        <input type="text" class="form-control" id="doctorName">
+        <label style="margin-top:10px;">身份证号</label>
+        <input type="text" class="form-control" id="doctorIdNumber">
+      </div>
+      <div id="verify-work" style="display:none; margin-top:10px;">
+        <label>工号</label>
+        <input type="text" class="form-control" id="doctorWorkId">
+      </div>
+      <div class="text-right" style="margin-top:15px;">
+        <button class="btn btn-default" onclick="closeModal()">取消</button>
+        <button class="btn btn-success" onclick="enableAutoSign()">开启自动签</button>
+        <button class="btn btn-primary" onclick="verifyDoctor()">验证</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- jQuery 2.x for better IE compatibility -->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@2.2.4/dist/jquery.min.js"></script>
+  <script>
+    var currentPatientId = null;
+
+    function sendPatient(id, btn) {
+      btn.disabled = true;
+      btn.innerText = '正在发送...';
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", "/send_patient/" + id, true);
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          btn.disabled = false;
+          btn.innerText = '发送信息';
+          if (xhr.status === 200) {
+            try {
+              var res = JSON.parse(xhr.responseText);
+              if (res.success) {
+                alert('发送成功！');
+                location.reload();
+              } else {
+                alert('失败：' + res.message);
+              }
+            } catch (e) {
+              alert('响应解析失败');
+            }
+          } else {
+            alert('请求失败，状态码：' + xhr.status);
+          }
+        }
+      };
+      xhr.send();
+    }
+
+    function handleSign(id) {
+      currentPatientId = id;
+      document.getElementById('doctorVerifyModal').style.display = 'block';
+    }
+
+    function closeModal() {
+      document.getElementById('doctorVerifyModal').style.display = 'none';
+    }
+
+    function switchTab(mode) {
+      var nameTab = document.getElementById('verify-name');
+      var workTab = document.getElementById('verify-work');
+      var tabs = document.getElementsByClassName('nav-tabs')[0].getElementsByTagName('li');
+      for (var i = 0; i < tabs.length; i++) {
+        tabs[i].className = '';
+      }
+      if (mode === 'name') {
+        nameTab.style.display = 'block';
+        workTab.style.display = 'none';
+        tabs[0].className = 'active';
+      } else {
+        nameTab.style.display = 'none';
+        workTab.style.display = 'block';
+        tabs[1].className = 'active';
+      }
+    }
+
+    function verifyDoctor() {
+      if (!currentPatientId) {
+        alert('请刷新页面重试');
+        return;
+      }
+      var postData = {};
+      if (document.getElementById('verify-name').style.display !== 'none') {
+        postData.name = document.getElementById('doctorName').value;
+        postData.idNumber = document.getElementById('doctorIdNumber').value;
+      } else {
+        postData.workId = document.getElementById('doctorWorkId').value;
+      }
+      postData.patientId = currentPatientId;
+
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "/verify_doctor", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          try {
+            var res = JSON.parse(xhr.responseText);
+            if (res.success) {
+              alert('验证成功！');
+              closeModal();
+            } else {
+              alert('验证失败：' + res.message);
+            }
+          } catch (e) {
+            alert('响应解析错误');
+          }
+        }
+      };
+      xhr.send(JSON.stringify(postData));
+    }
+
+    function enableAutoSign() {
+      if (!currentPatientId) {
+        alert('请刷新页面重试');
+        return;
+      }
+      var postData = {};
+      if (document.getElementById('verify-name').style.display !== 'none') {
+        postData.name = document.getElementById('doctorName').value;
+        postData.idNumber = document.getElementById('doctorIdNumber').value;
+      } else {
+        postData.workId = document.getElementById('doctorWorkId').value;
+      }
+      postData.autoSign = true;
+      postData.patientId = currentPatientId;
+
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "/auto_sign_doctor", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          try {
+            var res = JSON.parse(xhr.responseText);
+            if (res.success) {
+              alert('二维码生成成功，请扫码');
+              closeModal();
+            } else {
+              alert('开启失败：' + res.message);
+            }
+          } catch (e) {
+            alert('响应解析失败');
+          }
+        }
+      };
+      xhr.send(JSON.stringify(postData));
+    }
+  </script>
+</body>
+</html>

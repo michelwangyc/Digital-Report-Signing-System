@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>病人详情</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center">病人详情</h1>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>系统信息</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>消息来源：</strong> {{ patient.source_system or 'None' }}</p>
+                        <p><strong>消息ID：</strong> {{ patient.message_id or 'None' }}</p>
+                        <p><strong>院区代码：</strong> {{ patient.hospital_code or 'None' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>基本信息</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>患者姓名：</strong> {{ patient.name or 'None' }}</p>
+                        <p><strong>患者主索引：</strong> {{ patient.patient_id or 'None' }}</p>
+                        <p><strong>出生日期：</strong> {{ patient.dob or 'None' }}</p>
+                        <p><strong>年龄：</strong> {{ patient.age or 'None' }}</p>
+                        <p><strong>性别代码：</strong> {{ patient.sex_code or 'None' }}</p>
+                        <p><strong>性别：</strong> {{ patient.sex or 'None' }}</p>
+                        <p><strong>婚姻状况代码：</strong> {{ patient.marital_status_code or 'None' }}</p>
+                        <p><strong>婚姻状况：</strong> {{ patient.marital_status or 'None' }}</p>
+                        <p><strong>病案号：</strong> {{ patient.document_no or 'None' }}</p>
+                        <p><strong>民族代码：</strong> {{ patient.nation_code or 'None' }}</p>
+                        <p><strong>民族：</strong> {{ patient.nation or 'None' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>地址：</strong> {{ patient.address or 'None' }}</p>
+                        <p><strong>国籍代码：</strong> {{ patient.country_code or 'None' }}</p>
+                        <p><strong>国籍：</strong> {{ patient.country or 'None' }}</p>
+                        <p><strong>健康卡号：</strong> {{ patient.health_card_id or 'None' }}</p>
+                        <p><strong>职业代码：</strong> {{ patient.occupation_code or 'None' }}</p>
+                        <p><strong>职业：</strong> {{ patient.occupation or 'None' }}</p>
+                        <p><strong>工作单位：</strong> {{ patient.workplace or 'None' }}</p>
+                        <p><strong>单位电话：</strong> {{ patient.workplace_tel or 'None' }}</p>
+                        <p><strong>证件号码：</strong> {{ patient.identity_num or 'None' }}</p>
+                        <p><strong>证件类型代码：</strong> {{ patient.id_type_code or 'None' }}</p>
+                        <p><strong>证件类型：</strong> {{ patient.id_type or 'None' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>就诊信息</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>就诊号码：</strong> {{ patient.visit_number or 'None' }}</p>
+                        <p><strong>住院次数：</strong> {{ patient.visit_times or 'None' }}</p>
+                        <p><strong>就诊类型代码：</strong> {{ patient.visit_type_code or 'None' }}</p>
+                        <p><strong>就诊类型：</strong> {{ patient.visit_type or 'None' }}</p>
+                        <p><strong>就诊状态代码：</strong> {{ patient.adm_status_code or 'None' }}</p>
+                        <p><strong>就诊状态：</strong> {{ patient.adm_status or 'None' }}</p>
+                        <p><strong>就诊医生代码：</strong> {{ patient.doctor_code or 'None' }}</p>
+                        <p><strong>就诊医生：</strong> {{ patient.doctor_name or 'None' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>就诊日期：</strong> {{ patient.visit_start_date or 'None' }}</p>
+                        <p><strong>就诊时间：</strong> {{ patient.visit_start_time or 'None' }}</p>
+                        <p><strong>就诊科室代码：</strong> {{ patient.dept_code or 'None' }}</p>
+                        <p><strong>就诊科室：</strong> {{ patient.visit_dept or 'None' }}</p>
+                        <p><strong>病区代码：</strong> {{ patient.ward_code or 'None' }}</p>
+                        <p><strong>病区：</strong> {{ patient.ward_name or 'None' }}</p>
+                        <p><strong>床号：</strong> {{ patient.bed_no or 'None' }}</p>
+                        <p><strong>费用类型：</strong> {{ patient.fee_type or 'None' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>检查信息</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>身高：</strong> {{ patient.height }}</p>
+                <p><strong>体重：</strong> {{ patient.weight }}</p>
+                <p><strong>临床症状：</strong> {{ patient.clinical_symptoms }}</p>
+            </div>
+        </div>
+
+        <!-- 添加医嘱信息卡片 -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>医嘱信息</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>医嘱明细ID：</strong> {{ patient.order_item_id or 'None' }}</p>
+                        <p><strong>医嘱状态代码：</strong> {{ patient.order_status_code or 'None' }}</p>
+                        <p><strong>医嘱子类代码：</strong> {{ patient.order_sub_cat_code or 'None' }}</p>
+                        <p><strong>医嘱子类描述：</strong> {{ patient.order_sub_cat_desc or 'None' }}</p>
+                        <p><strong>医嘱大类代码：</strong> {{ patient.order_cat_code or 'None' }}</p>
+                        <p><strong>医嘱大类描述：</strong> {{ patient.order_cat_desc or 'None' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>父医嘱ID：</strong> {{ patient.parent_order_id or 'None' }}</p>
+                        <p><strong>医嘱操作人编码：</strong> {{ patient.update_user_code or 'None' }}</p>
+                        <p><strong>医嘱操作人描述：</strong> {{ patient.update_user_desc or 'None' }}</p>
+                        <p><strong>服务标识：</strong> {{ patient.service_method or 'None' }}</p>
+                        <p><strong>医嘱项ID：</strong> {{ patient.arcim or 'None' }}</p>
+                        <p><strong>最后更新时间：</strong> {{ patient.update_date or 'None' }} {{ patient.update_time or 'None' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>医疗信息</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>患者主诉：</strong> {{ patient.chaint or 'None' }}</p>
+                        <p><strong>患者病史：</strong> {{ patient.mehistory or 'None' }}</p>
+                        <p><strong>患者体征：</strong> {{ patient.hemogram or 'None' }}</p>
+                        <p><strong>用药情况：</strong> {{ patient.mesituation or 'None' }}</p>
+                        <p><strong>其他检查：</strong> {{ patient.inspresults or 'None' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>是否胸痛：</strong> {{ patient.chestpain or 'None' }}</p>
+                        <p><strong>生理周期：</strong> {{ patient.phycycle or 'None' }}</p>
+                        <p><strong>患者类型：</strong> {{ patient.pat_type or 'None' }}</p>
+                        <p><strong>患者标识：</strong> {{ patient.pat_tag or 'None' }}</p>
+                        <p><strong>病人情况：</strong> 
+                            {% if patient.admission_type == '0' %}
+                                普通病人
+                            {% elif patient.admission_type == '1' %}
+                                术后病人
+                            {% elif patient.admission_type == '2' %}
+                                危重病人
+                            {% elif patient.admission_type == '3' %}
+                                术后危重病人
+                            {% else %}
+                                未知
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 添加系统信息卡片 -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>系统信息</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>消息来源：</strong> {{ patient.source_system or 'None' }}</p>
+                        <p><strong>消息ID：</strong> {{ patient.message_id or 'None' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>检查申请单信息</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>检查申请单号：</strong> {{ patient.risr_app_num or 'None' }}</p>
+                        <p><strong>检查号：</strong> {{ patient.risr_exam_id or 'None' }}</p>
+                        <p><strong>检查注意事项：</strong> {{ patient.risr_matters_attention or 'None' }}</p>
+                        <p><strong>检查特殊病史：</strong> {{ patient.risr_special_medical_record or 'None' }}</p>
+                        <p><strong>检查申请科室：</strong> {{ patient.app_dept_desc or 'None' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>申请医生：</strong> {{ patient.risr_submit_doc_desc or 'None' }}</p>
+                        <p><strong>申请时间：</strong> {{ patient.risr_submit_time or 'None' }}</p>
+                        <p><strong>接收科室：</strong> {{ patient.risr_accept_dept_desc or 'None' }}</p>
+                        <p><strong>检查科室位置：</strong> {{ patient.risr_dept_location or 'None' }}</p>
+                        <p><strong>是否加急：</strong> {{ '是' if patient.risr_is_emergency else '否' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a href="{{ url_for('index') }}" class="btn btn-primary mt-3">返回待处理病人列表</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
